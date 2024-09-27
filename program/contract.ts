@@ -7,7 +7,7 @@ import { IDL } from './program';
 
 const PROGRAM_ID = new anchor.web3.PublicKey("5A4Xa5EhF2qJpjoG99pR9FoF6mnjVKXi7M8ZMDeEGXhC");
 
-const RPC_URL = "https://devnet.helius-rpc.com/?api-key=667d78f4-a39a-4588-8bcf-c7c892347ae2";
+const RPC_URL = "https://api.devnet.solana.com";
 
 export const connection = new anchor.web3.Connection(RPC_URL, 'confirmed');
 

@@ -27,7 +27,7 @@ export default function Home() {
     const initialDate = new anchor.BN(Math.floor(Date.now() / 1000));
 
     const connection = new Connection(
-      "https://devnet.helius-rpc.com/?api-key=667d78f4-a39a-4588-8bcf-c7c892347ae2"
+      "https://api.devnet.solana.com"
     );
     const transaction = new Transaction();
 
@@ -68,7 +68,7 @@ export default function Home() {
     const eventName = "Test Event";
     const initialDate = new anchor.BN(Math.floor(Date.now() / 1000));
     const connection = new Connection(
-      "https://devnet.helius-rpc.com/?api-key=667d78f4-a39a-4588-8bcf-c7c892347ae2"
+      "https://api.devnet.solana.com"
     );
     const transaction = new Transaction();
 
@@ -114,7 +114,7 @@ export default function Home() {
     const eventName = "Test Event";
     const initialDate = new anchor.BN(Math.floor(Date.now() / 1000));
     const connection = new Connection(
-      "https://devnet.helius-rpc.com/?api-key=667d78f4-a39a-4588-8bcf-c7c892347ae2"
+      "https://api.devnet.solana.com"
     );
     const transaction = new Transaction();
 
