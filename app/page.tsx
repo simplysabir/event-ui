@@ -11,7 +11,7 @@ import {
   clusterApiUrl,
 } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { EventNew } from "@/program/program";
+import { EventN } from "@/program/program";
 import { anchorProgram } from "@/program/contract";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import * as anchor from "@project-serum/anchor";
@@ -32,7 +32,7 @@ export default function Home() {
     const transaction = new Transaction();
 
     const [eventPDA] = await anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("event_new"), publicKey!.toBuffer(), Buffer.from(eventName)],
+      [Buffer.from("event_n"), publicKey!.toBuffer(), Buffer.from(eventName)],
       program.programId
     );
     console.log("eventPDA", eventPDA.toBase58());
@@ -73,7 +73,7 @@ export default function Home() {
     const transaction = new Transaction();
 
     const [eventPDA] = await anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("event_new"), publicKey!.toBuffer(), Buffer.from(eventName)],
+      [Buffer.from("event_n"), publicKey!.toBuffer(), Buffer.from(eventName)],
       program.programId
     );
     console.log("eventPDA", eventPDA.toBase58());
@@ -119,7 +119,7 @@ export default function Home() {
     const transaction = new Transaction();
 
     const [eventPDA] = await anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("event_new"), publicKey!.toBuffer(), Buffer.from(eventName)],
+      [Buffer.from("event_n"), publicKey!.toBuffer(), Buffer.from(eventName)],
       program.programId
     );
     console.log("eventPDA", eventPDA.toBase58());

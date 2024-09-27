@@ -1,7 +1,7 @@
-export type EventNew = {
-  "address": "Cqf3nHT8dkRBbJBPMJRa8RLTBfwcdHNijoDDqd95dwPV",
+export type EventN = {
+  "address": "5A4Xa5EhF2qJpjoG99pR9FoF6mnjVKXi7M8ZMDeEGXhC",
   "metadata": {
-    "name": "eventNew",
+    "name": "eventN",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
@@ -58,9 +58,7 @@ export type EventNew = {
                   110,
                   116,
                   95,
-                  110,
-                  101,
-                  119
+                  110
                 ]
               },
               {
@@ -165,9 +163,9 @@ export type EventNew = {
 };
 
 export const IDL = {
-  "address": "Cqf3nHT8dkRBbJBPMJRa8RLTBfwcdHNijoDDqd95dwPV",
+  "address": "5A4Xa5EhF2qJpjoG99pR9FoF6mnjVKXi7M8ZMDeEGXhC",
   "metadata": {
-    "name": "event_new",
+    "name": "event_n",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
@@ -224,9 +222,7 @@ export const IDL = {
                   110,
                   116,
                   95,
-                  110,
-                  101,
-                  119
+                  110
                 ]
               },
               {

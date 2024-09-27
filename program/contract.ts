@@ -2,10 +2,10 @@
 import * as anchor from '@coral-xyz/anchor';
 import type NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 import * as spl from '@solana/spl-token';
-import type { EventNew } from './program';
+import type { EventN } from './program';
 import { IDL } from './program';
 
-const PROGRAM_ID = new anchor.web3.PublicKey("Cqf3nHT8dkRBbJBPMJRa8RLTBfwcdHNijoDDqd95dwPV");
+const PROGRAM_ID = new anchor.web3.PublicKey("5A4Xa5EhF2qJpjoG99pR9FoF6mnjVKXi7M8ZMDeEGXhC");
 
 const RPC_URL = "https://devnet.helius-rpc.com/?api-key=667d78f4-a39a-4588-8bcf-c7c892347ae2";
 
@@ -30,7 +30,7 @@ export const getProvider = (wallet: anchor.Wallet) => {
     const program = new anchor.Program(
       idl,
       provider,
-    ) as unknown as anchor.Program<EventNew>;
+    ) as unknown as anchor.Program<EventN>;
   
     return program;
   };
