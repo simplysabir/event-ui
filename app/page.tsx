@@ -1,101 +1,191 @@
-import Image from "next/image";
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+import {
+  Transaction,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Keypair,
+  sendAndConfirmTransaction,
+  Connection,
+  clusterApiUrl,
+} from "@solana/web3.js";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { EventNew } from "@/program/program";
+import { anchorProgram } from "@/program/contract";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import * as anchor from "@project-serum/anchor";
+import { BN } from "bn.js";
+import { Wallet } from "@coral-xyz/anchor";
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const wallet = useAnchorWallet();
+  const { publicKey, wallets, sendTransaction } = useWallet();
+  const program = anchorProgram(wallet as Wallet);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  async function initializeEvent() {
+    const eventName = "Test Event";
+    const initialDate = new anchor.BN(Math.floor(Date.now() / 1000));
+
+    const connection = new Connection(
+      "https://devnet.helius-rpc.com/?api-key=667d78f4-a39a-4588-8bcf-c7c892347ae2"
+    );
+    const transaction = new Transaction();
+
+    const [eventPDA] = await anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("event_new"), publicKey!.toBuffer(), Buffer.from(eventName)],
+      program.programId
+    );
+    console.log("eventPDA", eventPDA.toBase58());
+    console.log("public key", publicKey);
+    console.log("system program", anchor.web3.SystemProgram.programId);
+
+    const ix = await program.methods
+      .initializeEvent(eventName, initialDate)
+      .accounts({
+        event: eventPDA,
+        user: publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as never)
+      .instruction();
+
+    console.log("instruction added :");
+    console.log("instruction", ix);
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = publicKey!;
+    transaction.add(ix);
+    const signTx = await wallet?.signTransaction(transaction);
+    const serialized_transaction = await signTx?.serialize();
+    console.log("Here's the transaction", serialized_transaction);
+
+    const sig = await connection.sendRawTransaction(serialized_transaction!);
+    console.log("signature is : ", sig);
+    console.log("public key detected", publicKey);
+    console.log("event created");
+  }
+
+  async function updateEvent() {
+    const eventName = "Test Event";
+    const initialDate = new anchor.BN(Math.floor(Date.now() / 1000));
+    const connection = new Connection(
+      "https://devnet.helius-rpc.com/?api-key=667d78f4-a39a-4588-8bcf-c7c892347ae2"
+    );
+    const transaction = new Transaction();
+
+    const [eventPDA] = await anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("event_new"), publicKey!.toBuffer(), Buffer.from(eventName)],
+      program.programId
+    );
+    console.log("eventPDA", eventPDA.toBase58());
+    console.log("public key", publicKey);
+    console.log("system program", anchor.web3.SystemProgram.programId);
+    // Update the event date
+    const newDate = new anchor.BN(initialDate.toNumber() + 86400); // Add one day
+    const ix = await program.methods
+      .updateEvent(newDate)
+      .accounts({
+        event: eventPDA,
+        user: publicKey,
+      } as never) // Use 'as any' to bypass TypeScript checking
+      .instruction();
+
+    console.log("instruction added :");
+    console.log("instruction", ix);
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = publicKey!;
+    transaction.add(ix);
+    const signTx = await wallet?.signTransaction(transaction);
+    const serialized_transaction = await signTx?.serialize();
+    console.log("Here's the transaction", serialized_transaction);
+
+    const sig = await connection.sendRawTransaction(serialized_transaction!);
+    console.log("signature is : ", sig);
+    console.log("public key detected", publicKey);
+    console.log("event updated");
+
+    const eventAccount = await program.account.event.fetch(eventPDA);
+    console.log("Event account", eventAccount.date.toNumber());
+    console.log("Event account", eventAccount.name);
+    console.log("Event account", eventAccount.attendees);
+  }
+
+  async function addAttendee() {
+    const eventName = "Test Event";
+    const initialDate = new anchor.BN(Math.floor(Date.now() / 1000));
+    const connection = new Connection(
+      "https://devnet.helius-rpc.com/?api-key=667d78f4-a39a-4588-8bcf-c7c892347ae2"
+    );
+    const transaction = new Transaction();
+
+    const [eventPDA] = await anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("event_new"), publicKey!.toBuffer(), Buffer.from(eventName)],
+      program.programId
+    );
+    console.log("eventPDA", eventPDA.toBase58());
+    console.log("public key", publicKey);
+    console.log("system program", anchor.web3.SystemProgram.programId);
+    const ix = await program.methods.addAttendee()
+    .accounts({
+      event: eventPDA,
+      user:publicKey,
+    } as never)  // Use 'as any' to bypass TypeScript checking
+    .instruction();
+
+    console.log("instruction added :");
+    console.log("instruction", ix);
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = publicKey!;
+    transaction.add(ix);
+    const signTx = await wallet?.signTransaction(transaction);
+    const serialized_transaction = await signTx?.serialize();
+    console.log("Here's the transaction", serialized_transaction);
+
+    const sig = await connection.sendRawTransaction(serialized_transaction!);
+    console.log("signature is : ", sig);
+    console.log("public key detected", publicKey);
+    console.log("attendee added");
+
+    const eventAccount = await program.account.event.fetch(eventPDA);
+    console.log("Event account", eventAccount.date.toNumber());
+    console.log("Event account", eventAccount.name);
+    console.log("Event account", eventAccount.attendees);
+  }
+
+  function printProgramId() {
+    console.log("Program ID", program.programId.toBase58());
+  }
+  return (
+    <>
+      <div className="container mx-auto">
+        <div className="flex justify-center items-center h-screen">
+          <button
+            onClick={() => initializeEvent()}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Create Event
+          </button>
+          <button
+            onClick={() => printProgramId()}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
-            Read our docs
-          </a>
+            Print Program ID
+          </button>
+          <button
+            onClick={() => updateEvent()}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Update Event
+          </button>
+          <button
+            onClick={() => addAttendee()}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          > 
+            Add Attendee
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 }
